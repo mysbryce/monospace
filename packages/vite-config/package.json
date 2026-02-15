@@ -1,0 +1,16 @@
+{
+  "name": "@repo/vite-config",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": "./vite.config.ts"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@preact/preset-vite": "^2.10.3",
+    "vite": "^7.3.1",
+    "@types/node": "^22.15.3",
+    "typescript": "5.9.2"
+  }
+}
