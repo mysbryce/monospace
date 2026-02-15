@@ -1,3 +1,5 @@
+![(Monospace Thumbnail)\[\]](https://i.ibb.co/N6zWrDfW/monospace-thumbnail.jpg)
+
 # Monospace
 
 A monorepo for developing FiveM NUI interfaces. Built with Bun, Turborepo, Preact, Vite, and Tailwind CSS -- providing shared configurations, UI utilities, and a consistent development workflow across multiple NUI projects.
