@@ -18,15 +18,15 @@ const register = (exposes: Expose): void => {
   }
 }
 
-const invoke = (key: ExposeKey, ...args: unknown[]): unknown => {
-  const fn = registry.get(key)
+const invoke = (data: { key: ExposeKey; args: unknown[] }): unknown => {
+  const fn = registry.get(data.key)
 
   if (!fn) {
-    console.warn(`[expose] No function registered for key: "${key}"`)
+    console.warn(`[expose] No function registered for key: "${data.key}"`)
     return
   }
 
-  return fn(...args)
+  return fn(...data.args)
 }
 
 export const expose = (exposes: Expose): void => {
@@ -59,8 +59,10 @@ export const initExposes = (): void => {
  *    local args = { ... }
  *      SendNUIMessage({
  *        type = 'invokeExpose',
- *        key = key,
- *        args = args,
+ *        data = {
+ *         key = key,
+ *         args = args
+ *        }
  *      })
  *    end
  *  end
