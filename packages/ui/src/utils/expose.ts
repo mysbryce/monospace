@@ -2,14 +2,13 @@ import z from 'zod'
 import { fetchNui } from './fetch.js'
 import { useEvent } from './useEvent.js'
 
-
 export const exposeKeySchema = z.string()
-export const exposeFunctionSchema = z.function({ input: z.array(z.unknown()), output: z.unknown() })
+export const exposeFunctionSchema = z.function({ input: z.array(z.any()), output: z.unknown() })
 export const exposeSchema = z.record(exposeKeySchema, exposeFunctionSchema)
 
 export type Expose = z.infer<typeof exposeSchema>
 export type ExposeKey = z.infer<typeof exposeKeySchema>
-export type ExposeFunction = (...args: unknown[]) => unknown
+export type ExposeFunction = (...args: any[]) => unknown
 
 const registry = new Map<ExposeKey, ExposeFunction>()
 

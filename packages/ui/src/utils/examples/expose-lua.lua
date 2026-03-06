@@ -1,5 +1,5 @@
 ---@class ExposeRegistries
----@type table<string, fun(args: table, callback: fun(result: any, err: string|nil): nil): nil>
+---@type table<string, fun(args: table, callback?: fun(result: any, err: string|nil): nil): nil>
 local registries = {}
 
 ---@type table<string, fun(result: any, err: string|nil): nil>
@@ -23,7 +23,7 @@ RegisterNUICallback('exposes', function(keys, cb)
         data = {
           requestId = requestId,
           key = key,
-          args = args or {}
+          args = args
         }
       })
     end
