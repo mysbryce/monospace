@@ -2,6 +2,7 @@ import z from 'zod'
 import { fetchNui } from './fetch.js'
 import { useEvent } from './useEvent.js'
 
+
 export const exposeKeySchema = z.string()
 export const exposeFunctionSchema = z.function({ input: z.array(z.unknown()), output: z.unknown() })
 export const exposeSchema = z.record(exposeKeySchema, exposeFunctionSchema)
@@ -18,15 +19,34 @@ const register = (exposes: Expose): void => {
   }
 }
 
-const invoke = (data: { key: ExposeKey; args: unknown[] }): unknown => {
-  const fn = registry.get(data.key)
+interface InvokePayload {
+  requestId: string
+  key: ExposeKey
+  args: unknown[]
+}
+
+interface InvokeResult {
+  requestId: string
+  result?: unknown
+  error?: string
+}
+
+const invoke = async ({ requestId, key, args }: InvokePayload): Promise<void> => {
+  const fn = registry.get(key)
 
   if (!fn) {
-    console.warn(`[expose] No function registered for key: "${data.key}"`)
+    const error = `No function registered for key: "${key}"`
+    console.warn(`[expose] ${error}`)
+    fetchNui<InvokeResult>('exposeResult', { requestId, error })
     return
   }
 
-  return fn(...data.args)
+  try {
+    const result = await Promise.resolve(fn(...args))
+    fetchNui<InvokeResult>('exposeResult', { requestId, result })
+  } catch (e) {
+    fetchNui<InvokeResult>('exposeResult', { requestId, error: String(e) })
+  }
 }
 
 export const expose = (exposes: Expose): void => {
@@ -44,30 +64,3 @@ export const expose = (exposes: Expose): void => {
 export const initExposes = (): void => {
   useEvent('invokeExpose', invoke)
 }
-
-/**
- * 
- * And you must put this code in the client side (LUA)
- * 
- * ```lua
- * ---@type table<string, fun(...: any): nil>
- * local registries = {}
- * 
- * RegisterNUICallback('exposes', function(keys, cb)
- *  for _, key in ipairs(keys) do
- *   registries[key] = function(...)
- *    local args = { ... }
- *      SendNUIMessage({
- *        type = 'invokeExpose',
- *        data = {
- *         key = key,
- *         args = args
- *        }
- *      })
- *    end
- *  end
- * end
- * 
- * return registries
- * ```
- */
